@@ -474,6 +474,7 @@ protected:
       // TODO(Karsten1987): support serialized message passed by intraprocess
       throw std::runtime_error("storing serialized messages in intra process is not supported yet");
     }
+    TRACEPOINT(rclcpp_publish, nullptr, static_cast<const void *>(&serialized_msg));
     auto status = rcl_publish_serialized_message(publisher_handle_.get(), serialized_msg, nullptr);
     if (RCL_RET_OK != status) {
       rclcpp::exceptions::throw_from_rcl_error(status, "failed to publish serialized message");
@@ -484,6 +485,7 @@ protected:
   do_loaned_message_publish(
     std::unique_ptr<ROSMessageType, std::function<void(ROSMessageType *)>> msg)
   {
+    TRACEPOINT(rclcpp_publish, nullptr, static_cast<const void *>(&msg));
     auto status = rcl_publish_loaned_message(publisher_handle_.get(), msg.get(), nullptr);
 
     if (RCL_RET_PUBLISHER_INVALID == status) {

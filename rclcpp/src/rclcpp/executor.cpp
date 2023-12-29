@@ -626,15 +626,6 @@ Executor::execute_subscription(rclcpp::SubscriptionBase::SharedPtr subscription)
       },
       [&]() {subscription->handle_loaned_message(loaned_msg, message_info);});
     if (nullptr != loaned_msg) {
-      rcl_ret_t ret = rcl_return_loaned_message_from_subscription(
-        subscription->get_subscription_handle().get(),
-        loaned_msg);
-      if (RCL_RET_OK != ret) {
-        RCLCPP_ERROR(
-          rclcpp::get_logger("rclcpp"),
-          "rcl_return_loaned_message_from_subscription() failed for subscription on topic '%s': %s",
-          subscription->get_topic_name(), rcl_get_error_string().str);
-      }
       loaned_msg = nullptr;
     }
   } else {

@@ -372,7 +372,19 @@ public:
     auto typed_message = static_cast<ROSMessageType *>(loaned_message);
     // message is loaned, so we have to make sure that the deleter does not deallocate the message
     auto sptr = std::shared_ptr<ROSMessageType>(
-      typed_message, [](ROSMessageType * msg) {(void) msg;});
+            typed_message, [this](ROSMessageType * msg) {
+        if (nullptr != msg) {
+          rcl_ret_t ret = rcl_return_loaned_message_from_subscription(
+            get_subscription_handle().get(),
+            msg);
+          if (RCL_RET_OK != ret) {
+            RCLCPP_ERROR(
+              rclcpp::get_logger("rclcpp"),
+              "rcl_return_loaned_message_from_subscription() failed for subscription on topic '%s': %s",
+              get_topic_name(), rcl_get_error_string().str);
+          }
+        }
+        });
 
     std::chrono::time_point<std::chrono::system_clock> now;
     if (subscription_topic_statistics_) {
